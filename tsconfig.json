@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+	"module": "es6",
+	"noImplicitAny": true,
+	"target": "es5",
+	"skipLibCheck": true,
+	"strictNullChecks": true,
+	"sourceMap": true,
+    },
+    "include:": [
+	"src/**/*"
+    ],
+    "exclude": [
+	"node_modules"
+    ]
+}

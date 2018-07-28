@@ -1,0 +1,32 @@
+{
+  "name": "wasm-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/build.js",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "wabt": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.4",
+    "@types/webassembly-js-api": "0.0.1",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicholasLYang/wasm-generator.git"
+  },
+  "author": "Nicholas Yang <nick@nicholasyang.com> (nicholasyang.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NicholasLYang/wasm-generator/issues"
+  },
+  "homepage": "https://github.com/NicholasLYang/wasm-generator#readme"
+}

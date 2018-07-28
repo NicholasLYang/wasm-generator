@@ -1,2 +1,4 @@
 *.wasm
 *.wat
+node_modules
+dist/
