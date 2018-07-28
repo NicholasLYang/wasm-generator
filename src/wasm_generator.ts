@@ -1,7 +1,18 @@
 import { readFileSync, writeFileSync } from "fs";
 import { parseWat } from "wabt";
 
-let functions: { [s: string]: string; } = {};
+let operations: Op[] = [
+    { oType: "i32", name: "add" },
+    { oType: "i64", name: "add" },
+    { oType: "i32", name: "sub" },
+    { oType: "i64", name: "sub" },
+    { oType: "i32", name: "mul" },
+    { oType: "i64", name: "div" },
+];
+
+let functions: { [s: string]: string; } = {
+    "main": "main"
+};
 
 interface Param {
     pType: string;
@@ -42,7 +53,11 @@ const loop = (block: string): string => {
 }
 
 const exportFunc = (wasmName: string): string => {
-    let jsName = functions[wasmName];;
+    let jsName = functions[wasmName];
+    if (jsName == undefined) {
+        jsName = wasmName;
+        functions[wasmName] = wasmName;
+    }
     return `(export "${jsName}" (func $${wasmName}))`;
 }
 // Yeah yeah painter's algorithm and string concat is slow. I'll fix it later
@@ -75,9 +90,8 @@ const paramsList = (params: Param[], returnType: string): string => {
 const writeFile = (fileName: string) => {
     const v1: Value = { vType: "i32", value: 100 };
     const v2: Value = { vType: "i32", value: 50 };
-    const add: Op = { oType: "i32", name: "add" };
     const watFile = `${fileName}.wat`;
-
+    const add = operations[0];
     const mainFunc: Func = {
         name: "main",
         params: [],
