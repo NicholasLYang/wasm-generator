@@ -10,6 +10,8 @@
   "devDependencies": {
     "@types/node": "^10.5.4",
     "@types/webassembly-js-api": "0.0.1",
+    "pegjs": "^0.10.0",
+    "pegjs-loader": "^0.5.4",
     "ts-loader": "^4.4.2",
     "typescript": "^2.9.2",
     "webpack": "^4.16.3",

@@ -11,6 +11,11 @@ module.exports = {
 		test: /\.tsx?$/,
 		use: 'ts-loader',
 		exclude: /node_modules/
+	    },
+	    {
+		test: /\.pegjs$/,
+		use: "pegjs-loader",
+		exclude: /node_modules/
 	    }
 	]
     },
