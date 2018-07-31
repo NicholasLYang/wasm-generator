@@ -1,44 +1,11 @@
 import { readFileSync, writeFileSync } from "fs";
 import { parseWat } from "wabt";
-
-let operations: { [s: string]: Op; } = {
-    "+": { oType: "i32", name: "add" },
-    "-": { oType: "i32", name: "sub" },
-    "*": { oType: "i32", name: "mul" },
-    "/": { oType: "i32", name: "div_s" },
-};
+import { isValue, Param, Value, Op, Func, TypedAST } from "./types"
+import { binOps } from "./operations"
 
 let functions: { [s: string]: string; } = {
     "main": "main"
 };
-
-interface Param {
-    pType: string;
-    name: string;
-}
-
-interface Value {
-    vType: string;
-    value: number;
-}
-
-interface Op {
-    oType: string;
-    name: string;
-}
-
-interface Func {
-    name: string;
-    params: Param[];
-    block: string;
-    returnType: string;
-}
-
-interface AST {
-    op: string;
-    arg1: Value | AST;
-    arg2: Value | AST;
-}
 
 const literal = ({ vType, value }: Value): string => {
     return `(${vType}.const ${value})`;
@@ -111,24 +78,21 @@ const writeFile = (fileName: string, body: string) => {
     writeFileSync(`${fileName}.wasm`, Buffer.from(buffer));
 }
 
-const isValue = (obj: AST | Value): obj is Value => {
-    return (<Value>obj).vType !== undefined;
-}
 
-const writeAST = (ast: AST): string => {
-    const { op, arg1, arg2 }: { op: string, arg1: Value | AST, arg2: Value | AST }
+const writeAST = (ast: TypedAST): string => {
+    const { op, arg1, arg2 }: { op: Op, arg1: Value | TypedAST, arg2: Value | TypedAST }
         = ast;
     if (isValue(arg1) &&
         isValue(arg2)) {
-        return binOp(operations[op], literal(<Value>arg1), literal(<Value>arg2));
+        return binOp(op, literal(<Value>arg1), literal(<Value>arg2));
     }
     if (isValue(arg1)) {
-        return binOp(operations[op], literal(<Value>arg1), writeAST(<AST>arg2));
+        return binOp(op, literal(<Value>arg1), writeAST(<TypedAST>arg2));
     }
     if (isValue(arg2)) {
-        return binOp(operations[op], writeAST(<AST>arg1), literal(<Value>arg2));
+        return binOp(op, writeAST(<TypedAST>arg1), literal(<Value>arg2));
     }
-    return binOp(operations[op], writeAST(<AST>arg1), writeAST(<AST>arg2));
+    return binOp(op, writeAST(<TypedAST>arg1), writeAST(<TypedAST>arg2));
 }
 
 export { writeFile, writeAST };

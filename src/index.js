@@ -1,7 +1,8 @@
-import { writeAST, writeFile } from "./wasm_generator.ts";
-import { instantiate } from "./wasm_loader.ts";
+import { writeAST, writeFile } from "./generator.ts";
+import { instantiate } from "./loader.ts";
 import parser from "./expr_parser.js";
 import { createInterface } from "readline"
+import { checkTypes } from "./type_checker.ts"
 
 const rl = createInterface({
     input: process.stdin,
@@ -12,7 +13,8 @@ rl.setPrompt(">");
 rl.prompt();
 
 rl.on("line", res => {
-    let ast = parser.parse(res);
+    let parseAst = parser.parse(res);
+    let typedAST = checkTypes(parseAst);
     writeFile("test", writeAST(ast));
     instantiate("test")
 	.then(res => {
