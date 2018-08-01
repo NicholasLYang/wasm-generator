@@ -1,5 +1,5 @@
-import { Op, TypedAST, ParseAST, isValue } from "./types"
 import { getBinOp } from "./operations"
+import { Op, TypedAST, ParseAST, isValue } from "./types"
 
 const checkTypes = (ast: ParseAST): TypedAST => {
     const { op, arg1, arg2 } = ast;

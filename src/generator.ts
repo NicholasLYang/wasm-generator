@@ -15,8 +15,8 @@ const binOp = ({ oType, name }: Op, expr1: string, expr2: string): string => {
     return `(${oType}.${name} ${expr1} ${expr2})`;
 }
 
-const func = ({ name, params, block, returnType }: Func): string => {
-    return `(func $${name} ${paramsList(params, returnType)} ${block})`
+const func = ({ name, params, body, returnType }: Func): string => {
+    return `(func $${name} ${paramsList(params, returnType)} ${body})`
 }
 
 const loop = (block: string): string => {
@@ -32,7 +32,7 @@ const exportFunc = (wasmName: string): string => {
     return `(export "${jsName}" (func $${wasmName}))`;
 }
 // Yeah yeah painter's algorithm and string concat is slow. I'll fix it later
-const moduleDefs = (funcs: Func[]) => {
+const writeFunctions = (funcs: Func[]) => {
     let functionDefs = funcs
         .reduce(
             (acc, funcExpr) =>
@@ -60,16 +60,10 @@ const paramsList = (params: Param[], returnType: string): string => {
 
 const writeFile = (fileName: string, body: string) => {
     const watFile = `${fileName}.wat`;
-    const mainFunc: Func = {
-        name: "main",
-        params: [],
-        returnType: "i32",
-        block: body
-    };
 
     writeFileSync(
         watFile,
-        moduleDefs([mainFunc])
+        body
     );
 
     const wasmModule =
@@ -78,8 +72,19 @@ const writeFile = (fileName: string, body: string) => {
     writeFileSync(`${fileName}.wasm`, Buffer.from(buffer));
 }
 
+const writeModule = (ast: TypedAST): string => {
+    const returnType = ast.op.oType;
+    const body = writeOperations(ast);
+    const mainFunc: Func = {
+        name: "main",
+        params: [],
+        returnType,
+        body
+    };
+    return writeFunctions([mainFunc]);
+}
 
-const writeAST = (ast: TypedAST): string => {
+const writeOperations = (ast: TypedAST): string => {
     const { op, arg1, arg2 }: { op: Op, arg1: Value | TypedAST, arg2: Value | TypedAST }
         = ast;
     if (isValue(arg1) &&
@@ -87,12 +92,12 @@ const writeAST = (ast: TypedAST): string => {
         return binOp(op, literal(<Value>arg1), literal(<Value>arg2));
     }
     if (isValue(arg1)) {
-        return binOp(op, literal(<Value>arg1), writeAST(<TypedAST>arg2));
+        return binOp(op, literal(<Value>arg1), writeOperations(<TypedAST>arg2));
     }
     if (isValue(arg2)) {
-        return binOp(op, writeAST(<TypedAST>arg1), literal(<Value>arg2));
+        return binOp(op, writeOperations(<TypedAST>arg1), literal(<Value>arg2));
     }
-    return binOp(op, writeAST(<TypedAST>arg1), writeAST(<TypedAST>arg2));
+    return binOp(op, writeOperations(<TypedAST>arg1), writeOperations(<TypedAST>arg2));
 }
 
-export { writeFile, writeAST };
+export { writeFile, writeModule };

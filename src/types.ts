@@ -1,3 +1,4 @@
+
 export interface Param {
     pType: string;
     name: string;
@@ -16,7 +17,7 @@ export interface Op {
 export interface Func {
     name: string;
     params: Param[];
-    block: string;
+    body: string;
     returnType: string;
 }
 

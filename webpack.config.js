@@ -20,7 +20,7 @@ module.exports = {
 	]
     },
     resolve: {
-	extensions: [ 'tsx', 'ts', 'js', "pegjs" ]
+	extensions: [ '.tsx', '.ts', '.js', ".pegjs" ]
     },
     output: {
 	filename: "build.js",

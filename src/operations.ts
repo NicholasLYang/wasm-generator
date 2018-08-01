@@ -5,10 +5,10 @@ let binOps: { [s: string]: Op; } = {
     "- i32 i32": { oType: "i32", name: "sub" },
     "* i32 i32": { oType: "i32", name: "mul" },
     "/ i32 i32": { oType: "i32", name: "div_s" },
-    "+ f32 f32": { oType: "i32", name: "add" },
-    "- f32 f32": { oType: "i32", name: "sub" },
-    "* f32 f32": { oType: "i32", name: "mul" },
-    "/ f32 f32": { oType: "i32", name: "div_s" },
+    "+ f32 f32": { oType: "f32", name: "add" },
+    "- f32 f32": { oType: "f32", name: "sub" },
+    "* f32 f32": { oType: "f32", name: "mul" },
+    "/ f32 f32": { oType: "f32", name: "div_s" },
 };
 
 const getBinOp = (
