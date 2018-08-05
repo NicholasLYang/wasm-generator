@@ -1,4 +1,4 @@
-import { Op, TypedAST, Value, isValue } from "./types";
+import { Op, Value, isValue } from "./types";
 
 let binOps: { [s: string]: Op; } = {
     "+ i32 i32": { oType: "i32", name: "add" },

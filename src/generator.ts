@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "fs";
 import { parseWat } from "wabt";
-import { isValue, Param, Value, Op, Func, TypedAST } from "./types"
+import { isValue, Param, Value, Op, Func, TypedBinOp } from "./types"
 import { binOps } from "./operations"
 
 let functions: { [s: string]: string; } = {
@@ -72,7 +72,7 @@ const writeFile = (fileName: string, body: string) => {
     writeFileSync(`${fileName}.wasm`, Buffer.from(buffer));
 }
 
-const writeModule = (ast: TypedAST): string => {
+const writeModule = (ast: TypedBinOp): string => {
     const returnType = ast.op.oType;
     const body = writeOperations(ast);
     const mainFunc: Func = {
@@ -84,20 +84,20 @@ const writeModule = (ast: TypedAST): string => {
     return writeFunctions([mainFunc]);
 }
 
-const writeOperations = (ast: TypedAST): string => {
-    const { op, arg1, arg2 }: { op: Op, arg1: Value | TypedAST, arg2: Value | TypedAST }
+const writeOperations = (ast: TypedBinOp): string => {
+    const { op, arg1, arg2 }: { op: Op, arg1: Value | TypedBinOp, arg2: Value | TypedBinOp }
         = ast;
     if (isValue(arg1) &&
         isValue(arg2)) {
         return binOp(op, literal(<Value>arg1), literal(<Value>arg2));
     }
     if (isValue(arg1)) {
-        return binOp(op, literal(<Value>arg1), writeOperations(<TypedAST>arg2));
+        return binOp(op, literal(<Value>arg1), writeOperations(<TypedBinOp>arg2));
     }
     if (isValue(arg2)) {
-        return binOp(op, writeOperations(<TypedAST>arg1), literal(<Value>arg2));
+        return binOp(op, writeOperations(<TypedBinOp>arg1), literal(<Value>arg2));
     }
-    return binOp(op, writeOperations(<TypedAST>arg1), writeOperations(<TypedAST>arg2));
+    return binOp(op, writeOperations(<TypedBinOp>arg1), writeOperations(<TypedBinOp>arg2));
 }
 
 export { writeFile, writeModule };

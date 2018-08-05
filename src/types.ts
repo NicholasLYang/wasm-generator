@@ -21,16 +21,28 @@ export interface Func {
     returnType: string;
 }
 
-export interface ParseAST {
-    op: string;
-    arg1: Value | ParseAST;
-    arg2: Value | ParseAST;
+export interface ParseTree {
+    node: Function | BinOp;
+    arg1: Value | ParseTree;
+    arg2: Value | ParseTree;
 }
 
-export interface TypedAST {
+export interface BinOp {
+    op: string;
+    arg1: Value | BinOp;
+    arg2: Value | BinOp;
+}
+
+export interface TypedBinOp {
     op: Op;
-    arg1: Value | TypedAST;
-    arg2: Value | TypedAST;
+    arg1: Value | TypedBinOp;
+    arg2: Value | TypedBinOp;
+}
+
+export interface TypedParseTree {
+    node: Function | TypedBinOp;
+    arg1: Value | TypedParseTree;
+    arg2: Value | TypedParseTree;
 }
 
 
