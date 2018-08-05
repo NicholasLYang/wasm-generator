@@ -1,3 +1,6 @@
+/*
+  A vague attempt to write my own parser. Will finish soon
+*/
 const ops = ['+', '-', '*', '/'];
 
 
