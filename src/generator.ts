@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "fs";
 import { parseWat } from "wabt";
-import { isValue, Param, Value, Op, Func, TypedBinOp } from "./types"
+import { isValue, isVar, Param, Var, Value, Op, TypedFunc, TypedBinOp, TypedParseTree } from "./types"
 import { binOps } from "./operations"
 
 let functions: { [s: string]: string; } = {
@@ -15,8 +15,9 @@ const binOp = ({ oType, name }: Op, expr1: string, expr2: string): string => {
     return `(${oType}.${name} ${expr1} ${expr2})`;
 }
 
-const func = ({ name, params, body, returnType }: Func): string => {
-    return `(func $${name} ${paramsList(params, returnType)} ${body})`
+const func = ({ name, params, body, returnType }: TypedFunc): string => {
+    let myParams = Object.keys(params).map(key => params[key]);
+    return `(func $${name} ${paramsList(myParams, returnType)} ${writeBinOp(body)})`
 }
 
 const loop = (block: string): string => {
@@ -32,11 +33,11 @@ const exportFunc = (wasmName: string): string => {
     return `(export "${jsName}" (func $${wasmName}))`;
 }
 // Yeah yeah painter's algorithm and string concat is slow. I'll fix it later
-const writeFunctions = (funcs: Func[]) => {
+const writeFunctions = (funcs: TypedFunc[]) => {
     let functionDefs = funcs
         .reduce(
-            (acc, funcExpr) =>
-                `${acc} ${func(funcExpr)}`,
+            (acc, fun) =>
+                `${acc} ${func(fun)}`,
             ""
         );
     let functionExports = funcs
@@ -72,32 +73,30 @@ const writeFile = (fileName: string, body: string) => {
     writeFileSync(`${fileName}.wasm`, Buffer.from(buffer));
 }
 
-const writeModule = (ast: TypedBinOp): string => {
-    const returnType = ast.op.oType;
-    const body = writeOperations(ast);
-    const mainFunc: Func = {
-        name: "main",
-        params: [],
-        returnType,
-        body
-    };
-    return writeFunctions([mainFunc]);
+const writeModule = (parseTree: TypedParseTree): string => {
+    return writeFunctions(parseTree.functions);
 }
 
-const writeOperations = (ast: TypedBinOp): string => {
-    const { op, arg1, arg2 }: { op: Op, arg1: Value | TypedBinOp, arg2: Value | TypedBinOp }
-        = ast;
-    if (isValue(arg1) &&
-        isValue(arg2)) {
-        return binOp(op, literal(<Value>arg1), literal(<Value>arg2));
-    }
-    if (isValue(arg1)) {
-        return binOp(op, literal(<Value>arg1), writeOperations(<TypedBinOp>arg2));
-    }
-    if (isValue(arg2)) {
-        return binOp(op, writeOperations(<TypedBinOp>arg1), literal(<Value>arg2));
-    }
-    return binOp(op, writeOperations(<TypedBinOp>arg1), writeOperations(<TypedBinOp>arg2));
+const variable = (myVar: Var): string => {
+    return `(get_local $${myVar.name})`
 }
+
+const primary = (primary: Var | Value | TypedBinOp): string => {
+    if (isValue(primary)) {
+        return literal(primary);
+    } else if (isVar(primary)) {
+        return variable(primary);
+    } else {
+        return writeBinOp(primary);
+    }
+}
+
+const writeBinOp = (ast: TypedBinOp): string => {
+    let { op, arg1, arg2 } = ast;
+    const lhs = primary(arg1);
+    const rhs = primary(arg2);
+    return binOp(op, lhs, rhs);
+}
+
 
 export { writeFile, writeModule };

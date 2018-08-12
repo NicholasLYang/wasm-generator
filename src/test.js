@@ -6,3 +6,4 @@ fun goodbye_world(a: Integer, b: String, c: Float) { 11 - 20 - b }
 `);
 
 
+console.log(parseTree);

@@ -4,6 +4,10 @@ export interface Param {
     name: string;
 }
 
+export interface ParamTable {
+    [name: string]: Param;
+}
+
 export interface Value {
     vType: string;
     value: number;
@@ -16,36 +20,64 @@ export interface Op {
 
 export interface Func {
     name: string;
-    params: Param[];
-    body: string;
+    params: ParamTable;
+    body: BinOp;
     returnType: string;
 }
 
 export interface ParseTree {
-    node: Function | BinOp;
-    arg1: Value | ParseTree;
-    arg2: Value | ParseTree;
+    functions: Func[];
 }
 
 export interface BinOp {
     op: string;
-    arg1: Value | BinOp;
-    arg2: Value | BinOp;
+    arg1: Name | Value | BinOp | Var;
+    arg2: Name | Value | BinOp | Var;
+}
+
+export interface TypedFunc {
+    name: string;
+    params: ParamTable;
+    body: TypedBinOp;
+    returnType: string;
 }
 
 export interface TypedBinOp {
     op: Op;
-    arg1: Value | TypedBinOp;
-    arg2: Value | TypedBinOp;
+    arg1: Value | Var | TypedBinOp;
+    arg2: Value | Var | TypedBinOp;
 }
 
 export interface TypedParseTree {
-    node: Function | TypedBinOp;
-    arg1: Value | TypedParseTree;
-    arg2: Value | TypedParseTree;
+    functions: TypedFunc[];
+}
+
+export interface Name {
+    name: string;
+}
+
+export interface Var {
+    name: string;
+    varType: string;
 }
 
 
 export const isValue = (obj: any): obj is Value => {
     return (<Value>obj).vType !== undefined;
+}
+
+export const isVar = (obj: any): obj is Var => {
+    return (<Var>obj).varType !== undefined;
+}
+
+export const isTypedBinOp = (obj: any): obj is TypedBinOp => {
+    return (<TypedBinOp>obj).op !== undefined;
+}
+
+export const isName = (obj: any): obj is Name => {
+    return (<Name>obj).name !== undefined;
+}
+
+export const isBinOp = (obj: any): obj is BinOp => {
+    return (<BinOp>obj).op !== undefined;
 }

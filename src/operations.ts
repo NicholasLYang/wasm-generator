@@ -18,7 +18,7 @@ const getBinOp = (
 ): Op => {
     const operator = binOps[`${opName} ${arg1Type} ${arg2Type}`];
     if (operator === undefined) {
-        throw new Error(
+        throw TypeError(
             `Operator ${opName} does not exist for types ${arg1Type} and ${arg2Type}`
         );
     }
